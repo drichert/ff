@@ -4,7 +4,8 @@ import processing.serial.*;
 
 Serial port;
 
-int numFreqs = 200;
+int numFreqs  = 200;
+int ndxOffset = 100; 
 
 int[] ndxs   = new int[numFreqs];
 float[] vals = new float[numFreqs];
@@ -26,11 +27,11 @@ void setup() {
   port = new Serial(this, Serial.list()[0], 115200);
   port.clear();
   
-  lines       = loadStrings("structure.txt");
+  lines       = loadStrings("trees.txt");
   String text = join(lines, " ");
   words       = split(text, " ");
   
-  textOutput = createWriter("output.txt");
+  textOutput = createWriter("trees-maple.txt");
 }
 
 void draw() {
@@ -42,9 +43,6 @@ void draw() {
     String buffer = port.readStringUntil(lf);
    
     if(buffer != null) {
-      //ndxs = new int[numFreqs];
-      //vals = new float[numFreqs];
-      
       String[] bufferVals = split(buffer, ",");
       
       for(int i = 0; i < bufferVals.length; i++) {
@@ -52,7 +50,6 @@ void draw() {
           if(i % 2 == 0) {
             _ndx = i / 2;
           
-            //println("!!!" + bufferVals[i] + "!!!");
             ndxs[_ndx] = int(bufferVals[i]);
           }
           else {
@@ -92,7 +89,7 @@ void draw() {
         
     //int wordsNdx = int(float(words.length) * vals[i]);
     // TODO: Add index offset paramter (potentiometer controlled?)
-    int wordsNdx = int(vals[i]) % words.length;
+    int wordsNdx = int(vals[i] + ndxOffset) % words.length;
     _words[i] = words[wordsNdx];
   }
   printArray(_words);
