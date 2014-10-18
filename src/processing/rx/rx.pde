@@ -5,7 +5,7 @@ import processing.serial.*;
 Serial port;
 
 int numFreqs  = 200;
-int ndxOffset = 100; 
+int ndxOffset = 200; 
 
 int[] ndxs   = new int[numFreqs];
 float[] vals = new float[numFreqs];
@@ -27,11 +27,11 @@ void setup() {
   port = new Serial(this, Serial.list()[0], 115200);
   port.clear();
   
-  lines       = loadStrings("trees.txt");
+  lines       = loadStrings("says.txt");
   String text = join(lines, " ");
   words       = split(text, " ");
   
-  textOutput = createWriter("trees-maple.txt");
+  textOutput = createWriter("rhubarb-says-200.txt");
 }
 
 void draw() {
@@ -82,7 +82,7 @@ void draw() {
   for(int i = 0; i < numFreqs; i++) {
     int x = width / numFreqs * ndxs[i];
     //float y = vals[i];
-    float y = height * vals[i];
+    float y = height * (vals[i] / 1024);
     
     //point(width / numFreqs * ndxs[i], vals[i]);
     line(x, 0, x, y);
