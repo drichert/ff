@@ -2,11 +2,11 @@ var Server = require("ws").Server;
 var server = new Server({ port: 8001 });
 
 var mockData = function() {
-  var vals = 32;
+  var vals = 200;
   var arr  = [];
 
   for(var i = 0; i < vals; i++) {
-    arr[i] = Math.floor(Math.random() * 16);
+    arr[i] = Math.floor(Math.random() * 1024);
   }
 
   return JSON.stringify(arr);
