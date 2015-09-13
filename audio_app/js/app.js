@@ -60,4 +60,16 @@ $(function() {
 
     req.send();
   })(a);
+
+  // UI setup
+  (function() {
+    $("#level_slider").slider({
+      min: 0,
+      max: 128,
+      slide: function(ev, sl) {
+        //$("#current_level").text(sl.value);
+        $("#current_level").text(sl.value / 128);
+      }
+    });
+  })();
 });
