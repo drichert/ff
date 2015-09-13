@@ -67,6 +67,8 @@ $(function() {
       context.decodeAudioData(req.response, function(buf) {
         src.buffer = buf;
 
+        var modBank = new ModBank(context);
+
         src.connect(gain);
         gain.connect(context.destination);
 
@@ -77,3 +79,32 @@ $(function() {
     req.send();
   })(a);
 });
+
+var ModBank = function(audioContext) {
+  this.context = audioContext;
+  this.numNodes = 200;
+
+  this.maxFreq = 20; // Hz
+  this.minFreq = 0.001; // Hz
+
+  this.nodes = [];
+
+  // freqs - Array of frequency scalars (values 0..1)
+  this.setFreqs = function(freqs) {
+    var that = this;
+
+    this.nodes.forEach(function(node, ndx) {
+      var freq = freqs[ndx] * that.maxFreq + that.minFreq;
+
+      node.exponentialRampToValueAtTime(freq,
+        context.currentTime + 0.001);
+    });
+  };
+
+  (function() {
+    for(var i = 0; i < this.numNodes; i++) {
+      this.nodes[i] = audioContext.createOscillator();
+      this.nodes[i].frequency.value = this.minFreq;
+    }
+  }).call(this);
+};
