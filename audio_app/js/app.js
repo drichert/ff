@@ -1,13 +1,44 @@
-(function() {
+$(function() {
   var a   = new AudioContext();
   var src = a.createBufferSource();
 
-  var ws = new WebSocket("ws://localhost:8001");
+  var sock = new WebSocket("ws://localhost:8001");
 
-  ws.onmessage = function(msg) {
-    var data = JSON.parse(msg.data);
+  var chart = null;
 
-    $("#main").text(data.join(", "));
+  sock.onmessage = function(msg) {
+    var data   = JSON.parse(msg.data);
+    var canvas = $("#chart")[0].getContext("2d");
+
+    var datasets = [{ data: data, fillColor: "#abc" }];
+
+    var labels = Array.apply(null, Array(200)).map(
+      String.prototype.valueOf, "");
+
+    if(!chart) {
+      chart = new Chart(canvas).Bar({
+        labels:   labels,
+        datasets: datasets
+      }, {
+        animation:                true,
+        animationSteps:           10,
+        scaleOverride:            true,
+        scaleStartValue:          0,
+        scaleStepWidth:           64,
+        scaleSteps:               16,
+        barShowStroke:            false,
+        barDataSetSpacing:        3,
+        scaleShowVerticalLines:   false,
+        scaleShowHorizontalLines: false
+      });
+    }
+    else {
+      data.forEach(function(n, ndx) {
+        chart.datasets[0].bars[ndx].value = n;
+      });
+
+      chart.update();
+    }
   };
 
   // context - AudioContext
@@ -29,4 +60,4 @@
 
     req.send();
   })(a);
-})();
+});
