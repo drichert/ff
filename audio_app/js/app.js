@@ -1,9 +1,23 @@
 $(function() {
-  var a   = new AudioContext();
-  var src = a.createBufferSource();
+  var a    = new AudioContext();
+  var src  = a.createBufferSource();
+  var gain = a.createGain();
+
+  // UI setup
+  (function() {
+    $("#level_slider").slider({
+      min: 0,
+      max: 128,
+      slide: function(ev, sl) {
+        gainVal = sl.value / 128.0;
+
+        gain.gain.value = gainVal;
+        $("#current_level").text(gainVal);
+      }
+    });
+  })();
 
   var sock = new WebSocket("ws://localhost:8001");
-
   var chart = null;
 
   sock.onmessage = function(msg) {
@@ -53,23 +67,13 @@ $(function() {
       context.decodeAudioData(req.response, function(buf) {
         src.buffer = buf;
 
-        src.connect(a.destination);
-        //src.start(0);
+        src.connect(gain);
+        gain.connect(context.destination);
+
+        src.start(0);
       }, null);
     }
 
     req.send();
   })(a);
-
-  // UI setup
-  (function() {
-    $("#level_slider").slider({
-      min: 0,
-      max: 128,
-      slide: function(ev, sl) {
-        //$("#current_level").text(sl.value);
-        $("#current_level").text(sl.value / 128);
-      }
-    });
-  })();
 });
