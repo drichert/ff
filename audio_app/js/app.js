@@ -1,7 +1,8 @@
 $(function() {
-  var a    = new AudioContext();
-  var src  = a.createBufferSource();
-  var gain = a.createGain();
+  var a      = new AudioContext();
+  var src    = a.createBufferSource();
+  var gain   = a.createGain();
+  var buffer = null;
 
   var sock = new WebSocket("ws://localhost:8001");
   var chart = null;
@@ -55,7 +56,9 @@ $(function() {
         chart.update();
       }
 
-      playerBank.update(data).setLevels(data);
+      playerBank.update(data);
+                //.setLevels(data)
+                //.setLoopPoints(data);
     };
   });
 });
@@ -79,8 +82,6 @@ var ModBank = function(audioContext) {
       node.frequency.value = freq;
       //node.frequency.exponentialRampToValueAtTime(freq,
       //  that.context.currentTime + 0.001);
-
-      node.start();
     });
   };
 
@@ -88,6 +89,7 @@ var ModBank = function(audioContext) {
     for(var i = 0; i < this.numNodes; i++) {
       this.nodes[i] = this.context.createOscillator();
       this.nodes[i].frequency.value = this.minFreq;
+      this.nodes[i].start();
     }
   }).call(this);
 };
@@ -100,6 +102,7 @@ var PlayerBank = function(audioContext, path, cbk) {
   this.numNodes  = 200;
   this.nodes     = [];
   this.gainNodes = [];
+  this.buffer    = null;
 
   this.position = 0; // sec?
   this.rate     = 1; // ???
@@ -107,16 +110,44 @@ var PlayerBank = function(audioContext, path, cbk) {
   // data - Array from data source; should be an array of 200 0..1024 numbers
   this.update = function(data) {
     // convert to an array of 0..1 values
-    var scalars = data.map(function(n) { return n / 1024.0; });
+    //var scalars = data.map(function(n) { return n / 1024.0; });
 
-    this.modBank.setFreqs(scalars);
+    //this.modBank.setFreqs(scalars);
 
+    //for(var i = 0; i < this.numNodes; i++) {
+    //  this.modBank.nodes[i].connect(this.nodes[i].playbackRate);
+    //}
+
+    return this.setupBufferSources()
+               //.setupModulators(data)
+               .setLevels(data)
+               .setLoopPoints(data)
+               .start();
+  };
+
+  this.setupBufferSources = function() {
     for(var i = 0; i < this.numNodes; i++) {
-      this.modBank.nodes[i].connect(this.nodes[i].playbackRate);
+      this.nodes[i] = this.context.createBufferSource();
+
+      this.nodes[i].buffer = this.buffer;
+      this.nodes[i].connect(this.gainNodes[i]);
     }
 
     return this;
   };
+
+  //this.setupModulators = function(data) {
+  //  // convert to an array of 0..1 values
+  //  var scalars = data.map(function(n) { return n / 1024.0; });
+
+  //  this.modBank.setFreqs(scalars);
+
+  //  for(var i = 0; i < this.numNodes; i++) {
+  //    this.modBank.nodes[i].connect(this.nodes[i].playbackRate);
+  //  }
+
+  //  return this;
+  //};
 
   this.setLevels = function(data) {
     var that = this;
@@ -125,15 +156,74 @@ var PlayerBank = function(audioContext, path, cbk) {
     var scalars = data.map(function(n) { return n / 1024.0; });
 
     scalars.forEach(function(n, ndx) {
-      console.log(arguments);
       that.gainNodes[ndx].gain.value = n;
+    });
+
+    return this;
+  };
+
+  this.segLength = function() {
+    return this.buffer.duration / this.numNodes;
+  };
+
+  this.startPosition = function(nodeNum) {
+    return this.segLength() * nodeNum;
+  };
+
+  this.endPosition = function(nodeNum) {
+    return this.segLength() * nodeNum + this.segLength();
+  };
+
+  this.setLoopPoints = function(data) {
+    var that = this;
+
+    this.nodes.forEach(function(node, ndx) {
+      //var node = this.nodes[nodeNum];
+      // convert to an array of 0..1 values
+      // TODO: DRY
+      var scalars = data.map(function(n) { return n / 1024.0; });
+
+      var loopLen = (that.segLength() * scalars[ndx]) / 8;
+      //console.log("loop len", loopLen, "seg len", that.segLength());
+
+      var halfLen = loopLen / 2;
+
+      var startPos = that.startPosition(ndx) +
+        (that.segLength() / 2) - halfLen;
+
+      node.loop = true;
+      //node.loopStart = this.startPosition(ndx);
+      //node.loopEnd   = this.endPosition(ndx);
+
+      node.loopStart = startPos;
+      node.loopEnd   = startPos + (halfLen * 2);
+    });
+
+    return this;
+  };
+
+  this.setupGainNodes = function() {
+    for(var i = 0; i < this.numNodes; i++) {
+      this.gainNodes[i] = this.context.createGain();
+      this.gainNodes[i].connect(this.context.destination);
+    }
+
+    return this;
+  };
+
+  this.start = function() {
+    //console.log(this.nodes);
+    this.nodes.forEach(function(node) {
+      node.start(0, node.loopStart, 1.5);
     });
   };
 
   (function() {
     var that = this;
 
-    this.modBank = new ModBank(this.context);
+    this.setupGainNodes();
+
+    //this.modBank = new ModBank(this.context);
 
     var req = new XMLHttpRequest();
 
@@ -142,18 +232,7 @@ var PlayerBank = function(audioContext, path, cbk) {
 
     req.onload = function() {
       that.context.decodeAudioData(req.response, function(buf) {
-        for(var i = 0; i < that.numNodes; i++) {
-          that.nodes[i] = that.context.createBufferSource();
-
-          that.nodes[i].buffer = buf;
-          that.nodes[i].loop   = true;
-
-          that.gainNodes[i] = that.context.createGain();
-          that.gainNodes[i].connect(that.context.destination);
-
-          that.nodes[i].connect(that.gainNodes[i]);
-          that.nodes[i].start();
-        }
+        that.buffer = buf;
       }, null);
 
       that.callback();
