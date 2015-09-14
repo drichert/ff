@@ -19,5 +19,5 @@ server.on("connection", function(s) {
 
   setInterval(function() {
     s.emit("data:dump");
-  }, 2000);
+  }, 300);
 });

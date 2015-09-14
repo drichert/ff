@@ -127,6 +127,10 @@ var PlayerBank = function(audioContext, path, cbk) {
 
   this.setupBufferSources = function() {
     for(var i = 0; i < this.numNodes; i++) {
+      if(this.nodes[i]) {
+        this.nodes[i].disconnect();
+      }
+
       this.nodes[i] = this.context.createBufferSource();
 
       this.nodes[i].buffer = this.buffer;
@@ -156,7 +160,7 @@ var PlayerBank = function(audioContext, path, cbk) {
     var scalars = data.map(function(n) { return n / 1024.0; });
 
     scalars.forEach(function(n, ndx) {
-      that.gainNodes[ndx].gain.value = n;
+      that.gainNodes[ndx].gain.value = Math.pow(n, 2);
     });
 
     return this;
@@ -183,7 +187,7 @@ var PlayerBank = function(audioContext, path, cbk) {
       // TODO: DRY
       var scalars = data.map(function(n) { return n / 1024.0; });
 
-      var loopLen = (that.segLength() * scalars[ndx]) / 8;
+      var loopLen = (that.segLength() * scalars[ndx]) / 3;
       //console.log("loop len", loopLen, "seg len", that.segLength());
 
       var halfLen = loopLen / 2;
@@ -196,7 +200,7 @@ var PlayerBank = function(audioContext, path, cbk) {
       //node.loopEnd   = this.endPosition(ndx);
 
       node.loopStart = startPos;
-      node.loopEnd   = startPos + (halfLen * 2);
+      node.loopEnd   = startPos + loopLen;
     });
 
     return this;
@@ -212,10 +216,23 @@ var PlayerBank = function(audioContext, path, cbk) {
   };
 
   this.start = function() {
+    var that = this;
     //console.log(this.nodes);
-    this.nodes.forEach(function(node) {
-      node.start(0, node.loopStart, 1.5);
-    });
+    //this.nodes.forEach(function(node, ndx) {
+    //  node.start(
+    //    that.context.currentTime + (that.segLength() * ndx), 
+    //    node.loopStart, 
+    //    that.segLength()
+    //  );
+    //});
+
+    var node = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+
+    node.start(
+      this.context.currentTime,  
+      node.loopStart,
+      this.segLength() * 100
+     );
   };
 
   (function() {
