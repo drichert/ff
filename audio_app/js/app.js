@@ -21,7 +21,10 @@ $(function() {
     });
   })();
 
-  var playerBank = new PlayerBank(a, "./media/crook.mp3", function() {
+  //var playerBank = new PlayerBank(a, "./media/crook.mp3", function() {
+  //var playerBank = new PlayerBank(a, "./media/window-seat-acapella.wav", function() {
+  //var playerBank = new PlayerBank(a, "./media/FFgentle.mp3", function() {
+  var playerBank = new PlayerBank(a, "./media/FFsays.MP3", function() {
     sock.onmessage = function(msg) {
       var data   = JSON.parse(msg.data);
       var canvas = $("#chart")[0].getContext("2d");
@@ -160,7 +163,7 @@ var PlayerBank = function(audioContext, path, cbk) {
     var scalars = data.map(function(n) { return n / 1024.0; });
 
     scalars.forEach(function(n, ndx) {
-      that.gainNodes[ndx].gain.value = Math.pow(n, 2);
+      that.gainNodes[ndx].gain.value = Math.pow(n, 1.2);
     });
 
     return this;
