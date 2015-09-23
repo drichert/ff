@@ -16,23 +16,25 @@ var parseData = function(data) {
   });
 };
 
+var serial = new serialport.SerialPort("/dev/ttyACM0", {
+  baudrate: 115200,
+  parser:   serialport.parsers.readline("\n")
+});
+
+var connection = null;
+
+serial.on("open", function() {
+  console.log("Serial Port Opened");
+
+  serial.on("data", function(data){
+    var json = JSON.stringify(parseData(data));
+
+    if(connection) connection.send(json);
+  });
+});
+
 socket.on("request", function(request) {
-  var connection = request.accept(null, request.origin);
-
-  var serial = new serialport.SerialPort("/dev/ttyACM0", {
-    baudrate: 115200,
-    parser:   serialport.parsers.readline("\n")
-  });
-
-  serial.on("open", function() {
-    console.log("Serial Port Opened");
-
-    serial.on("data", function(data){
-      var json = JSON.stringify(parseData(data));
-
-      connection.send(json);
-    });
-  });
+  connection = request.accept(null, request.origin);
 });
 
 server.listen(port, function() {

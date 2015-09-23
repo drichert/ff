@@ -4,7 +4,8 @@ $(function() {
   var gain   = a.createGain();
   var buffer = null;
 
-  var sock = new WebSocket("ws://localhost:8001");
+  //var sock = new WebSocket("ws://localhost:8001");
+  var sock = new WebSocket("ws://localhost:8181");
   var chart = null;
 
   // UI setup
@@ -128,15 +129,24 @@ var PlayerBank = function(audioContext, path, cbk) {
                .start();
   };
 
+  this.createBufferSources = function() {
+    for(var i = 0; i < this.numNodes; i++) {
+      this.nodes[i] = this.context.createBufferSource();
+    }
+  };
+
   this.setupBufferSources = function() {
     for(var i = 0; i < this.numNodes; i++) {
-      if(this.nodes[i]) {
-        this.nodes[i].disconnect();
+      //if(this.nodes[i]) {
+      //  this.nodes[i].disconnect();
+      //}
+
+      //this.nodes[i] = this.context.createBufferSource();
+
+      if(!this.nodes[i].buffer) {
+        this.nodes[i].buffer = this.buffer;
       }
 
-      this.nodes[i] = this.context.createBufferSource();
-
-      this.nodes[i].buffer = this.buffer;
       this.nodes[i].connect(this.gainNodes[i]);
     }
 
@@ -190,7 +200,7 @@ var PlayerBank = function(audioContext, path, cbk) {
       // TODO: DRY
       var scalars = data.map(function(n) { return n / 1024.0; });
 
-      var loopLen = (that.segLength() * scalars[ndx]) / 3;
+      var loopLen = (that.segLength() * scalars[ndx]) / 1.3;
       //console.log("loop len", loopLen, "seg len", that.segLength());
 
       var halfLen = loopLen / 2;
@@ -198,6 +208,7 @@ var PlayerBank = function(audioContext, path, cbk) {
       var startPos = that.startPosition(ndx) +
         (that.segLength() / 2) - halfLen;
 
+      console.log(startPos);
       node.loop = true;
       //node.loopStart = this.startPosition(ndx);
       //node.loopEnd   = this.endPosition(ndx);
@@ -221,26 +232,27 @@ var PlayerBank = function(audioContext, path, cbk) {
   this.start = function() {
     var that = this;
     //console.log(this.nodes);
-    //this.nodes.forEach(function(node, ndx) {
-    //  node.start(
-    //    that.context.currentTime + (that.segLength() * ndx), 
-    //    node.loopStart, 
-    //    that.segLength()
-    //  );
-    //});
+    this.nodes.forEach(function(node, ndx) {
+      node.start(
+        that.context.currentTime + (that.segLength() * ndx), 
+        node.loopStart, 
+        that.segLength()
+      );
+    });
 
-    var node = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+    //var node = this.nodes[Math.floor(Math.random() * this.nodes.length)];
 
-    node.start(
-      this.context.currentTime,  
-      node.loopStart,
-      this.segLength() * 100
-     );
+    //node.start(
+    //  this.context.currentTime,  
+    //  node.loopStart,
+    //  this.segLength() * 100
+    //);
   };
 
   (function() {
     var that = this;
 
+    this.createBufferSources();
     this.setupGainNodes();
 
     //this.modBank = new ModBank(this.context);
