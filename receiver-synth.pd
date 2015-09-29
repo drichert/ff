@@ -1,4 +1,4 @@
-#N canvas 482 1098 476 831 10;
+#N canvas 722 1098 716 831 10;
 #X declare -lib mrpeach;
 #X declare -lib zexy;
 #X declare -lib iem_tab;
@@ -39,7 +39,7 @@
 #X floatatom 186 266 8 0 0 0 - - -;
 #X floatatom 150 284 8 0 0 0 - - -;
 #X floatatom 135 311 8 0 0 0 - - -;
-#N canvas 962 1098 476 831 grain 1;
+#N canvas 962 1098 476 831 grain 0;
 #X obj 56 46 inlet~;
 #X obj 121 45 inlet~;
 #X text 15 28 center/position;
@@ -48,7 +48,29 @@
 #X text 179 27 start;
 #X obj 222 47 inlet~;
 #X text 226 27 end;
-#X obj 2 305;
+#X obj 91 187 vradio 15 1 0 3 empty empty empty 0 -8 0 10 -262144 -1
+-1 0;
+#X obj 82 284 route 0 1 2;
+#X msg 65 322 toc;
+#X msg 95 323 gentle;
+#X msg 144 322 says;
+#X obj 80 513 tabread4~;
+#X obj 114 355 t b s;
+#X obj 90 381 pack \$0 s;
+#X msg 86 418 set \$1-audio-\$2;
+#X obj 99 476 phasor~;
+#X obj 177 668 cos~;
+#X connect 8 0 9 0;
+#X connect 9 0 10 0;
+#X connect 9 1 11 0;
+#X connect 9 2 12 0;
+#X connect 10 0 14 0;
+#X connect 11 0 14 0;
+#X connect 12 0 14 0;
+#X connect 14 0 15 0;
+#X connect 14 1 15 1;
+#X connect 15 0 16 0;
+#X connect 16 0 13 0;
 #X restore 90 453 pd grain;
 #X obj 327 198 table \$0-audio-toc;
 #X obj 327 220 table \$0-audio-gentle;
