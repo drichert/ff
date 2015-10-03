@@ -1,0 +1,28 @@
+#N canvas 962 1098 476 831 10;
+#X obj 116 280 line~;
+#X obj 116 298 expr~ pow($v1 \, $v2);
+#X obj 62 133 inlet;
+#X msg 106 250 0 \$1;
+#X text 67 61 comment;
+#X obj 228 271 inlet~;
+#X text 167 236 comment;
+#X obj 62 154 unpack;
+#X obj 76 223 f;
+#X obj 59 183 t f b b;
+#X text 137 192 1: Trigger message - [amp dec( 2: Exponent value (env
+slope) \, signal;
+#X obj 115 323 outlet~;
+#X msg 48 247 0;
+#X msg 77 248 \$1;
+#X connect 0 0 1 0;
+#X connect 1 0 11 0;
+#X connect 2 0 7 0;
+#X connect 3 0 0 0;
+#X connect 5 0 1 1;
+#X connect 7 0 8 1;
+#X connect 7 1 9 0;
+#X connect 8 0 13 0;
+#X connect 9 0 3 0;
+#X connect 9 1 8 0;
+#X connect 9 2 12 0;
+#X connect 13 0 0 0;
