@@ -1,17 +1,17 @@
-#N canvas 722 1098 716 831 10;
+#N canvas 482 1098 575 831 10;
 #X obj 183 512 osc~;
 #X obj 183 430 mtof~;
 #X obj 157 363 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 62 256;
+-262144 -1 -1 60 256;
 #X obj 380 452 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 115.609 256;
+-262144 -1 -1 214.145 256;
 #X obj 307 484 *~;
 #X obj 184 491 +~;
 #X obj 333 329 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 30 256;
+-262144 -1 -1 1048.16 256;
 #X obj 305 351 *~;
 #X obj 335 310 hsl 128 15 30 3000 1 0 empty empty empty -2 -8 0 10
--262144 -1 -1 0 0;
+-262144 -1 -1 9800 0;
 #X obj 215 773 dac~;
 #X obj 219 743 hip~ 10;
 #X obj 366 252 sig~;
@@ -21,7 +21,7 @@
 #X obj 233 661 *~;
 #X obj 305 381 osc~;
 #X obj 383 434 hsl 128 15 100 10000 1 0 empty empty empty -2 -8 0 10
--262144 -1 -1 400 0;
+-262144 -1 -1 2100 0;
 #X obj 440 394 sig~;
 #X floatatom 444 372 5 0 0 0 - - -;
 #X obj 355 474 *~;
@@ -47,7 +47,7 @@
 #X obj 157 304 t f b;
 #X obj 221 341 s \$0-decay;
 #X obj 304 198 r \$0-decay;
-#X obj 398 349 r \$0-decay;
+#X obj 371 362 r \$0-decay;
 #X obj 240 528 r \$0-decay;
 #X text 219 283 next decay;
 #X obj 163 188 metro 300;
@@ -55,7 +55,7 @@
 #X obj 167 387 *;
 #X text 165 345 pitch;
 #X obj 127 364 vsl 15 128 0.25 3 0 0 empty empty empty 0 -9 0 10 -262144
--1 -1 0 0;
+-1 -1 8082 0;
 #X floatatom 128 501 5 0 0 0 - - -;
 #X msg 106 338 1;
 #X msg 104 314 2;
@@ -92,6 +92,67 @@
 #X msg 250 560 1 \$1 30;
 #X msg 373 389 1 \$1 30;
 #X msg 304 251 1 \$1 60;
+#X msg 79 110 7;
+#N canvas 1061 1098 377 831 xenv 1;
+#X obj 56 284 sig~;
+#X obj 23 305 ffxenv;
+#X obj 107 146 hsl 128 10 3 300 1 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 12200 0;
+#X obj 24 61 inlet;
+#X obj 107 133 hsl 128 10 3 10000 1 0 empty empty empty -2 -8 0 10
+-262144 -1 -1 6400 0;
+#X obj 60 182 f;
+#X obj 24 349 outlet~;
+#X obj 60 206 f;
+#X obj 107 120 hsl 128 10 0.01 1 1 0 empty empty empty -2 -8 0 10 -262130
+-1 -1 6000 0;
+#X obj 59 156 f;
+#X obj 24 80 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 110 61 inlet;
+#X obj 149 62 inlet;
+#X obj 187 62 inlet;
+#X obj 23 117 t b b b;
+#X obj 23 234 pack f f f;
+#X obj 107 159 hsl 128 10 0.1 300 1 0 empty empty empty -2 -8 0 10
+-258113 -262144 -1 8200 0;
+#X text 278 69 1 Bang \, trigger env;
+#X text 282 91 2 Amp \, 0..1;
+#X text 283 109 3;
+#X text 299 110 Decay time (ms);
+#X text 283 134 4 Attack time (ms);
+#X text 281 154 5 Env curve (exp);
+#X obj 231 63 inlet;
+#X obj 164 270 print;
+#X floatatom 57 265 5 0 0 0 - - -;
+#X connect 0 0 1 1;
+#X connect 1 0 6 0;
+#X connect 2 0 7 1;
+#X connect 3 0 10 0;
+#X connect 4 0 5 1;
+#X connect 5 0 15 1;
+#X connect 7 0 15 2;
+#X connect 8 0 9 1;
+#X connect 9 0 15 0;
+#X connect 10 0 14 0;
+#X connect 11 0 8 0;
+#X connect 12 0 4 0;
+#X connect 13 0 2 0;
+#X connect 14 0 9 0;
+#X connect 14 1 5 0;
+#X connect 14 2 7 0;
+#X connect 15 0 1 0;
+#X connect 15 0 24 0;
+#X connect 16 0 25 0;
+#X connect 23 0 16 0;
+#X connect 25 0 0 0;
+#X coords 0 -1 1 1 142 72 1 100 100;
+#X restore 521 268 pd xenv;
+#X obj 487 230 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 577 377 bang~;
+#X obj 577 400 snapshot~;
+#X floatatom 599 465 15 0 0 0 - - -;
 #X connect 0 0 15 0;
 #X connect 1 0 5 0;
 #X connect 2 0 46 0;
@@ -171,3 +232,8 @@
 #X connect 77 0 75 0;
 #X connect 78 0 21 0;
 #X connect 79 0 76 0;
+#X connect 80 0 34 1;
+#X connect 81 0 84 0;
+#X connect 82 0 81 0;
+#X connect 83 0 84 0;
+#X connect 84 0 85 0;
