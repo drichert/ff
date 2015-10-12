@@ -23,9 +23,9 @@
 #X obj 40 138 inlet;
 #X text 36 104 |notenum amp=1 atk=0 dec=3000(;
 #X obj 309 132 hsl 128 15 1 1.1 0 0 \$0-det0 empty empty -2 -8 0 10
--262144 -1 -1 0 0;
+-262144 -1 -1 6000 0;
 #X obj 309 149 hsl 128 15 1 1.1 0 0 \$0-det1 empty empty -2 -8 0 10
--262144 -1 -1 0 0;
+-262144 -1 -1 5200 0;
 #X obj 309 166 hsl 128 15 1 1.1 0 0 \$0-det2 empty empty -2 -8 0 10
 -262144 -1 -1 0 0;
 #X obj 364 687 line~;
@@ -34,7 +34,7 @@
 #X obj 355 625 f 5000;
 #X floatatom 407 564 5 0 0 0 - - -;
 #X obj 446 565 hsl 128 15 50 5000 1 0 empty empty empty -2 -8 0 10
--262144 -1 -1 3600 0;
+-262144 -1 -1 3700 0;
 #X obj 355 581 del 10;
 #X obj 349 710 expr~ pow($v1 \, 6.2);
 #X obj 91 727 outlet~;
@@ -48,12 +48,18 @@
 #X obj 303 554 r \$0-atk;
 #X obj 122 132 inlet~;
 #X obj 166 132 inlet~;
-#X obj 214 132 inlet~;
+#X obj 211 132 inlet~;
 #X obj 85 344 *~;
 #X obj 300 472 *~;
 #X obj 307 284 *~;
 #X obj 38 169 unpack f f f f;
 #X obj 180 196 s \$0-dec;
+#X obj 107 291 r \$0-det0;
+#X obj 341 222 r \$0-det1;
+#X obj 340 400 r \$0-det2;
+#X obj 318 429 *~ 1;
+#X obj 321 251 *~ 1;
+#X obj 97 317 *~ 1;
 #X connect 0 0 5 0;
 #X connect 1 0 34 0;
 #X connect 2 0 7 0;
@@ -97,9 +103,9 @@
 #X connect 40 0 26 0;
 #X connect 41 0 40 0;
 #X connect 42 0 32 1;
-#X connect 43 0 46 1;
-#X connect 44 0 48 1;
-#X connect 45 0 47 1;
+#X connect 43 0 56 0;
+#X connect 44 0 55 0;
+#X connect 45 0 54 0;
 #X connect 46 0 4 0;
 #X connect 47 0 16 0;
 #X connect 48 0 8 0;
@@ -107,4 +113,10 @@
 #X connect 49 1 36 0;
 #X connect 49 2 38 0;
 #X connect 49 3 50 0;
+#X connect 51 0 56 1;
+#X connect 52 0 55 1;
+#X connect 53 0 54 1;
+#X connect 54 0 47 1;
+#X connect 55 0 48 1;
+#X connect 56 0 46 1;
 #X coords 0 -1 1 1 145 100 1 300 100;
